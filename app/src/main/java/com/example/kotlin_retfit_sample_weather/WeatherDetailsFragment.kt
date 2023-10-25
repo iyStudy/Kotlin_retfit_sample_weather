@@ -33,35 +33,30 @@ class WeatherDetailsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // argumentsを用いて、フラグメントに渡された天気のデータを取得
-        arguments?.let { bundle ->
-            val weather = bundle.getParcelable<Weather>("selected_city")
+        parentFragmentManager.setFragmentResultListener(
+            WeatherListFragment.REQUEST_WEATHER_DETAIL,
+            this
+        ) { _, bundle ->
+            val selectWeather: Weather =
+                bundle.getParcelable(WeatherListFragment.SELECTED_WEATHER)!!
             // 取得した天気のデータを利用して、各TextViewに情報をセット
-            weather?.let {
+            // 変数?.let{ } とは　変数がnullでなければ処理を実行 変数自身はitと省略して記述
+            selectWeather?.let {
                 binding.tvCityName.text = it.name
                 binding.tvWeatherDescription.text = "天気: ${it.weather[0].description}"
-                binding.tvFeelsLike.text = "体感温度: ${(it.main.feels_like - 273.15).roundToInt()}°C"
-                binding.tvMinTemp.text = "最低気温: ${(it.main.temp_min - 273.15).roundToInt()}°C"
-                binding.tvMaxTemp.text = "最高気温: ${(it.main.temp_max - 273.15).roundToInt()}°C"
-                binding.tvPressure.text = "気圧: ${it.main.pressure} hPa"
-                binding.tvHumidity.text = "湿度: ${it.main.humidity}%"
-                binding.tvWindSpeed.text = "風速: ${it.wind.speed} m/s"
-                binding.tvClouds.text = "雲の割合: ${it.clouds.all}%"
+                binding.tvFeelsLike.text =
+                    "体感温度: ${(it.main.feels_like - 273.15).roundToInt()}°C"
+                binding.tvMinTemp.text =
+                    "最低気温:°C"
+                binding.tvMaxTemp.text =
+                    "最高気温:°C"
+                binding.tvPressure.text = "気圧:  hPa"
+                binding.tvHumidity.text = "湿度: %"
+                binding.tvWindSpeed.text = "風速:  m/s"
+                binding.tvClouds.text = "雲の割合: %"
                 binding.tvCountry.text = "国: ${it.sys.country}"
-            }
-        }
-    }
 
-    // 新しいWeatherDetailsFragmentインスタンスを作成するためのヘルパーメソッド
-    companion object {
-        fun newInstance(city: Weather): WeatherDetailsFragment {
-            val fragment = WeatherDetailsFragment()
-            val args = Bundle()
-            // 渡された天気のデータをBundleに格納
-            args.putParcelable("selected_city", city)
-            // そのBundleをフラグメントのargumentsとしてセット
-            fragment.arguments = args
-            return fragment
+            }
         }
     }
 }

@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.kotlin_retfit_sample_weather.adapter.WeatherAdapter
 import com.example.kotlin_retfit_sample_weather.databinding.FragmentWeatherListBinding
@@ -21,10 +22,22 @@ class WeatherListFragment : Fragment() {
     private lateinit var binding: FragmentWeatherListBinding
 
     // OpenWeatherMapのAPIアクセスに必要なキー
-    private val API_KEY = "003ef1d65597b85d2ab6fa19b59383b6"
+    private val API_KEY = "自分のkey"
 
     // 対象となる日本の都市のリスト
-    private val cities = listOf("Tokyo", "Osaka", "Kyoto", "Hiroshima", "Fukuoka","Hokkaido","Okinawa","Aomori","Nagano","Tottori","Nagoya")
+    private val cities = listOf(
+        "Tokyo",
+        "Osaka",
+        "Kyoto",
+        "Hiroshima",
+        "Fukuoka",
+        "Hokkaido",
+        "Okinawa",
+        "Aomori",
+        "Nagano",
+        "Tottori",
+        "Nagoya"
+    )
 
     // 取得した天気情報を保存するためのリスト
     private val weatherList = mutableListOf<Weather>()
@@ -35,7 +48,7 @@ class WeatherListFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        binding = FragmentWeatherListBinding.inflate(inflater,container,false)
+        binding = FragmentWeatherListBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -74,16 +87,21 @@ class WeatherListFragment : Fragment() {
                         // 全ての都市の天気情報が取得できた場合
                         if (completedRequests == cities.size) {
                             // RecyclerViewのアダプターを設定して、取得したデータを表示
-                            binding.rvCitylist.adapter = WeatherAdapter(weatherList) { selectedWeather ->
-                                // 各都市のアイテムをクリックした時の動作を定義
-                                val fragment = WeatherDetailsFragment.newInstance(selectedWeather)
-                                requireActivity().supportFragmentManager.beginTransaction().apply {
-                                    setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right)
-                                    replace(R.id.fragmentContainer, fragment)  // 新しいフラグメントに切り替える
-                                    addToBackStack(null)  // バックスタックに追加して、戻るボタンで前のフラグメントに戻れるようにする
-                                    commit()  // 変更を確定する
+                            binding.rvCitylist.adapter =
+                                WeatherAdapter(weatherList) { selectedWeather ->
+                                    // 選択された天気情報を格納
+                                    parentFragmentManager.setFragmentResult(
+                                        REQUEST_WEATHER_DETAIL,
+                                        bundleOf(SELECTED_WEATHER to selectedWeather)
+                                    )
+                                    // 各都市のアイテムをクリックした時の動作を定義
+                                    val fragment = WeatherDetailsFragment()
+                                    parentFragmentManager.beginTransaction()
+                                        .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right)
+                                        .replace(R.id.fragmentContainer, fragment)  // 新しいフラグメントに切り替える
+                                        .addToBackStack(null)  // バックスタックに追加して、戻るボタンで前のフラグメントに戻れるようにする
+                                        .commit()  // 変更を確定する
                                 }
-                            }
                         }
                     }
                 }
@@ -94,6 +112,11 @@ class WeatherListFragment : Fragment() {
                 }
             })
         }
+    }
+
+    companion object {
+        val REQUEST_WEATHER_DETAIL = "REQUEST_WEATHER_DETAIL"
+        val SELECTED_WEATHER = "SELECTED_WEATHER"
     }
 
 
