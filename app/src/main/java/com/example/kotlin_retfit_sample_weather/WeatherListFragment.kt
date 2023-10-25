@@ -22,7 +22,7 @@ class WeatherListFragment : Fragment() {
     private lateinit var binding: FragmentWeatherListBinding
 
     // OpenWeatherMapのAPIアクセスに必要なキー
-    private val API_KEY = "003ef1d65597b85d2ab6fa19b59383b6"
+    private val API_KEY = "自分のkey"
 
     // 対象となる日本の都市のリスト
     private val cities = listOf(
